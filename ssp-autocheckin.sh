@@ -238,12 +238,12 @@ keep_alive() {
         alive=`cat alive | grep '^HTTP/2'  | cut -f2 -d ' '`
         echo $alive
         if [ "$alive" == "204" ]; then
-            return "续命成功"
+            echo "续命成功"
         else
-            return "续命失败"
+            echo "续命失败"
         fi
     fi
-    return "不续命"
+    echo "不续命"
 }
 
 #签到
@@ -359,8 +359,7 @@ ssp_autochenkin() {
 
             user_count=$(expr ${user_count} + 1)
         done
-        keep_alive
-        log_text="${log_text}\n续命情况：$?"
+        log_text="${log_text}\n续命情况：$(keep_alive)"
         log_text="${log_text}\n\n免费使用自: https://github.com/isecret/sspanel-autocheckin"
         send_message
 
