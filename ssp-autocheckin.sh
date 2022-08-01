@@ -269,7 +269,7 @@ ssp_autochenkin() {
             login_log_text="${login_log_text}签到时间: ${start_time}\n"
 
             if [ "${login_code}" == "1" ]; then
-                userinfo=$(curl -k -s -G -b ${COOKIE_PATH} "${domain}/getuserinfo")
+                userinfo=$(curl -L -k -s -G -b ${COOKIE_PATH} "${domain}/getuserinfo")
                 user=$(echo ${userinfo} | tr '\r\n' ' ' | jq -r ".info.user" 2>&1)
 
                 if [ "${user}" ]; then
@@ -315,7 +315,7 @@ ssp_autochenkin() {
                     user_log_text=""
                 fi
 
-                checkin=$(curl -k -s -d "" -b ${COOKIE_PATH} "${domain}/user/checkin")
+                checkin=$(curl -L -k -s -d "" -b ${COOKIE_PATH} "${domain}/user/checkin")
                 chechin_code=$(echo ${checkin} | jq -r ".ret" 2>&1)
                 checkin_status=$(echo ${checkin} | jq -r ".msg" 2>&1)
 
