@@ -234,9 +234,8 @@ send_message() {
 keep_alive() {
     if [ "${ALIVE}" ]; then
         echo keep_alive
-        curl -X PUT -H "Accept: application/vnd.github+json" -H "Authorization: token ${ALIVE}"  https://api.github.com/repos/yujianke100/sspanel-autocheckin/actions/workflows/work.yaml/enable > alive
-        alive=`cat alive`
-        echo $alive
+        curl -I -X PUT -H "Accept: application/vnd.github+json" -H "Authorization: token ${ALIVE}"  https://api.github.com/repos/yujianke100/sspanel-autocheckin/actions/workflows/work.yaml/enable > alive
+        echo `cat alive`
     fi
 }
 
