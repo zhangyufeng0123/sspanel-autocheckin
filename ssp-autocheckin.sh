@@ -256,7 +256,7 @@ ssp_autochenkin() {
             if [ -z "${domain}" ] || [ -z "${username}" ] || [ -z "${passwd}" ]; then
                 echo "账号信息配置异常，请检查配置" && exit 1
             fi
-            
+            echo $domain
             $ch=curl_init("${domain}")
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1)
             curl_setopt($ch, CURLOPT_AUTOREFERER, 1)
