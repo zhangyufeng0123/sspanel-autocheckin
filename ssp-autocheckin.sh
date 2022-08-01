@@ -243,9 +243,8 @@ ssp_autochenkin() {
             
             curl -i -L $domain > log
             domain=`cat log | grep '^location'  | cut -f2 -d ' '`
-            echo $domain
-            echo $username
-            echo $passwd
+            domain=${domain%?}
+            
             # 邮箱、域名脱敏处理
             username_prefix="${username%%@*}"
             username_suffix="${username#*@}"
