@@ -241,15 +241,6 @@ ssp_autochenkin() {
             username=$(echo ${user} | awk -F'----' '{print $2}')
             passwd=$(echo ${user} | awk -F'----' '{print $3}')
             
-            $ch= curl_init("${domain}")
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1)
-            curl_setopt($ch, CURLOPT_AUTOREFERER, 1)
-            curl_setopt($ch, CURLOPT_NOBODY, 1)
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1)
-            curl_setopt($ch, CURLOPT_HEADER, 1)
-            curl_exec($ch)
-            $domain = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL)
-            echo $domain
 
             # 邮箱、域名脱敏处理
             username_prefix="${username%%@*}"
@@ -265,7 +256,17 @@ ssp_autochenkin() {
             if [ -z "${domain}" ] || [ -z "${username}" ] || [ -z "${passwd}" ]; then
                 echo "账号信息配置异常，请检查配置" && exit 1
             fi
-
+            
+            $ch=curl_init("${domain}")
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1)
+            curl_setopt($ch, CURLOPT_AUTOREFERER, 1)
+            curl_setopt($ch, CURLOPT_NOBODY, 1)
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1)
+            curl_setopt($ch, CURLOPT_HEADER, 1)
+            curl_exec($ch)
+            $domain = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL)
+            echo $domain
+            
             login=$(curl "${domain}/auth/login" -d "email=${username}&passwd=${passwd}&code=" -c ${COOKIE_PATH} -L -k -s)
 
             start_time=$(date '+%Y-%m-%d %H:%M:%S')
