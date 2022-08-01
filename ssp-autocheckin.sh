@@ -241,7 +241,9 @@ ssp_autochenkin() {
             username=$(echo ${user} | awk -F'----' '{print $2}')
             passwd=$(echo ${user} | awk -F'----' '{print $3}')
             
-
+            curl -s -I $domain > log
+            $domain=`cat log | grep '^location'  | cut -f2 -d ' '`
+            echo $domain
             # 邮箱、域名脱敏处理
             username_prefix="${username%%@*}"
             username_suffix="${username#*@}"
