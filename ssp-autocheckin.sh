@@ -232,7 +232,9 @@ send_message() {
 }
 
 keep_alive() {
+    echo in_alive
     if [ "${ALIVE}" ]; then
+        echo keep_alive
         echo `curl -X PUT -H "Accept: application/vnd.github+json" -H "Authorization: token ${ALIVE}"  https://api.github.com/repos/yujianke100/sspanel-autocheckin/actions/workflows/work.yaml/enable`
     fi
 }
