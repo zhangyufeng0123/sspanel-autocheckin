@@ -237,7 +237,7 @@ keep_alive() {
         curl -I -X PUT -H "Accept: application/vnd.github+json" -H "Authorization: token ${ALIVE}"  https://api.github.com/repos/yujianke100/sspanel-autocheckin/actions/workflows/work.yaml/enable > alive
         alive=`cat alive | grep '^HTTP/2'  | cut -f2 -d ' '`
         echo $alive
-        if ["$alive" -eq "204"]; then
+        if [ "$alive" == "204" ]; then
             return "续命成功"
         else
             return "续命失败"
