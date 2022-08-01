@@ -369,3 +369,4 @@ ssp_autochenkin() {
 check_sys
 check_jq_installed_status
 ssp_autochenkin
+keep_alive
