@@ -25,15 +25,13 @@ env:
     WEWORK_AGENT_ID: ${{secrets.WEWORK_AGENT_ID}}
     WEWORK_SECRET: ${{secrets.WEWORK_SECRET}}
     DISPLAY_CONTEXT: ${{secrets.DISPLAY_CONTEXT}}
+    ALIVE: ${{secrets.ALIVE}}
 
 jobs:
     build:
         runs-on: ubuntu-latest
 
         steps:
-#             - name: Setup Debug Session
-#               uses: csexton/debugger-action@master
-              
             - name: Checkout codes
               uses: actions/checkout@v2
             
