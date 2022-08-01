@@ -257,8 +257,6 @@ ssp_autochenkin() {
                 echo "账号信息配置异常，请检查配置" && exit 1
             fi
             
-            $re = curl -L "${domain}"
-            echo -e ${re}
             login=$(curl -L "${domain}/auth/login" -d "email=${username}&passwd=${passwd}&code=" -c ${COOKIE_PATH} -L -k -s)
 
             start_time=$(date '+%Y-%m-%d %H:%M:%S')
