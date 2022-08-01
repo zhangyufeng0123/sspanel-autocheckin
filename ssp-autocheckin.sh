@@ -231,6 +231,16 @@ send_message() {
     fi
 }
 
+keep_alive() {
+    if [ "${ALIVE}" ]; then
+        curl \
+          -X PUT \
+          -H "Accept: application/vnd.github+json" \ 
+          -H "Authorization: token ${ALIVE}" \
+          https://api.github.com/repos/yujianke100/sspanel-autocheckin/actions/workflows/work.yaml/enable
+    fi
+}
+
 #签到
 ssp_autochenkin() {
     echo -e "${TITLE}"
