@@ -242,8 +242,9 @@ keep_alive() {
         else
             echo "续命失败"
         fi
+    else
+        echo "不续命"
     fi
-    echo "不续命"
 }
 
 #签到
