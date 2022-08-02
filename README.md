@@ -60,6 +60,7 @@ Fork 该仓库，进入仓库后点击 `Settings`，右侧栏点击 `Secrets`，
 | `WEWORK_AGENT_ID` | `100001` | 企业微信应用ID，填写申请应用的ID | 可选，与 `WEWORK_ID` 和 `WEWORK_SECRET` 配合使用 |
 | `WEWORK_SECRET` | `xxxxxxxxxxxxxxx` | 企业微信对应的 SECRET | 可选，与 `WEWORK_ID` 和 `WEWORK_AGENT_ID` 配合使用 |
 | `DISPLAY_CONTEXT`    | `1`                                            | 任务执行时是否显示详细信息，`1` 显示 `0` 关闭，默认值 `1`                       | 可选                   |
+| `ALIVE`    | xxxxxxxxxxxxxxx                                            | 保持Action存活，需要提供有workflow权限的[token](https://github.com/settings/tokens)                       | 可选                   |
 
 
 > TGBot 推送相关参数获取步骤可以点击 [TGBot 推送相关参数获取](#tgbot-推送相关参数获取) 查看。
