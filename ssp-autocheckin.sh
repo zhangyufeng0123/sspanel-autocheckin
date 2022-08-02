@@ -231,6 +231,22 @@ send_message() {
     fi
 }
 
+keep_alive() {
+    if [ "${ALIVE}" ]; then
+        echo keep_alive
+        curl -I -X PUT -H "Accept: application/vnd.github+json" -H "Authorization: token ${ALIVE}"  https://api.github.com/repos/yujianke100/sspanel-autocheckin/actions/workflows/work.yaml/enable > alive
+        alive=`cat alive | grep '^HTTP/2'  | cut -f2 -d ' '`
+        echo $alive
+        if [ "$alive" == "204" ]; then
+            echo "续命成功"
+        else
+            echo "续命失败"
+        fi
+    else
+        echo "不续命"
+    fi
+}
+
 #签到
 ssp_autochenkin() {
     echo -e "${TITLE}"
@@ -240,7 +256,11 @@ ssp_autochenkin() {
             domain=$(echo ${user} | awk -F'----' '{print $1}')
             username=$(echo ${user} | awk -F'----' '{print $2}')
             passwd=$(echo ${user} | awk -F'----' '{print $3}')
-
+            
+            curl -i -L $domain > log
+            domain=`cat log | grep '^location'  | cut -f2 -d ' '`
+            domain=${domain%?}
+            
             # 邮箱、域名脱敏处理
             username_prefix="${username%%@*}"
             username_suffix="${username#*@}"
@@ -255,8 +275,8 @@ ssp_autochenkin() {
             if [ -z "${domain}" ] || [ -z "${username}" ] || [ -z "${passwd}" ]; then
                 echo "账号信息配置异常，请检查配置" && exit 1
             fi
-
-            login=$(curl "${domain}/auth/login" -d "email=${username}&passwd=${passwd}&code=" -c ${COOKIE_PATH} -L -k -s)
+            
+            login=$(curl -L "${domain}/auth/login" -d "email=${username}&passwd=${passwd}&code=" -c ${COOKIE_PATH} -L -k -s)
 
             start_time=$(date '+%Y-%m-%d %H:%M:%S')
             login_code=$(echo ${login} | jq -r '.ret' 2>&1)
@@ -272,44 +292,45 @@ ssp_autochenkin() {
                 user=$(echo ${userinfo} | tr '\r\n' ' ' | jq -r ".info.user" 2>&1)
 
                 if [ "${user}" ]; then
-                    # 用户等级
-                    clasx=$(echo ${user} | jq -r ".class" 2>&1)
-                    # 等级过期时间
-                    class_expire=$(echo ${user} | jq -r ".class_expire" 2>&1)
-                    # 账户过期时间
-                    expire_in=$(echo ${user} | jq -r ".expire_in" 2>&1)
-                    # 上次签到时间
-                    last_check_in_time=$(echo ${user} | jq -r ".last_check_in_time" 2>&1)
-                    # 用户余额
-                    money=$(echo ${user} | jq -r ".money" 2>&1)
-                    # 用户限速
-                    node_speedlimit=$(echo ${user} | jq -r ".node_speedlimit" 2>&1)
-                    # 总流量
-                    transfer_enable=$(echo ${user} | jq -r ".transfer_enable" 2>&1)
-                    # 总共使用流量
-                    last_day_t=$(echo ${user} | jq -r ".last_day_t" 2>&1)
-                    # 剩余流量
-                    transfer_used=$(expr ${transfer_enable} - ${last_day_t})
-                    # 转换 GB
-                    transfer_enable_text=$(echo ${transfer_enable} | awk '{ byte =$1 /1024/1024**2 ; print byte " GB" }')
-                    last_day_t_text=$(echo ${last_day_t} | awk '{ byte =$1 /1024/1024**2 ; print byte " GB" }')
-                    transfer_used_text=$(echo ${transfer_used} | awk '{ byte =$1 /1024/1024**2 ; print byte " GB" }')
-                    # 转换上次签到时间
-                    if [ ${IS_MACOS} -eq 0 ]; then
-                        last_check_in_time_text=$(date -d "1970-01-01 UTC ${last_check_in_time} seconds" "+%F %T")
-                    else
-                        last_check_in_time_text=$(date -r ${last_check_in_time} '+%Y-%m-%d %H:%M:%S')
-                    fi
+#                     # 用户等级
+#                     clasx=$(echo ${user} | jq -r ".class" 2>&1)
+#                     # 等级过期时间
+#                     class_expire=$(echo ${user} | jq -r ".class_expire" 2>&1)
+#                     # 账户过期时间
+#                     expire_in=$(echo ${user} | jq -r ".expire_in" 2>&1)
+#                     # 上次签到时间
+#                     last_check_in_time=$(echo ${user} | jq -r ".last_check_in_time" 2>&1)
+#                     # 用户余额
+#                     money=$(echo ${user} | jq -r ".money" 2>&1)
+#                     # 用户限速
+#                     node_speedlimit=$(echo ${user} | jq -r ".node_speedlimit" 2>&1)
+#                     # 总流量
+#                     transfer_enable=$(echo ${user} | jq -r ".transfer_enable" 2>&1)
+#                     # 总共使用流量
+#                     last_day_t=$(echo ${user} | jq -r ".last_day_t" 2>&1)
+#                     # 剩余流量
+#                     transfer_used=$(expr ${transfer_enable} - ${last_day_t})
+#                     # 转换 GB
+#                     transfer_enable_text=$(echo ${transfer_enable} | awk '{ byte =$1 /1024/1024**2 ; print byte " GB" }')
+#                     last_day_t_text=$(echo ${last_day_t} | awk '{ byte =$1 /1024/1024**2 ; print byte " GB" }')
+#                     transfer_used_text=$(echo ${transfer_used} | awk '{ byte =$1 /1024/1024**2 ; print byte " GB" }')
+#                     # 转换上次签到时间
+#                     if [ ${IS_MACOS} -eq 0 ]; then
+#                         last_check_in_time_text=$(date -d "1970-01-01 UTC ${last_check_in_time} seconds" "+%F %T")
+#                     else
+#                         last_check_in_time_text=$(date -r ${last_check_in_time} '+%Y-%m-%d %H:%M:%S')
+#                     fi
 
-                    user_log_text="\n用户等级: VIP${clasx}\n"
-                    user_log_text="${user_log_text}用户余额: ${money} CNY\n"
-                    user_log_text="${user_log_text}用户限速: ${node_speedlimit} Mbps\n"
-                    user_log_text="${user_log_text}总流量: ${transfer_enable_text}\n"
-                    user_log_text="${user_log_text}剩余流量: ${transfer_used_text}\n"
-                    user_log_text="${user_log_text}已使用流量: ${last_day_t_text}\n"
-                    user_log_text="${user_log_text}等级过期时间: ${class_expire}\n"
-                    user_log_text="${user_log_text}账户过期时间: ${expire_in}\n"
-                    user_log_text="${user_log_text}上次签到时间: ${last_check_in_time_text}"
+#                     user_log_text="\n用户等级: VIP${clasx}\n"
+#                     user_log_text="${user_log_text}用户余额: ${money} CNY\n"
+#                     user_log_text="${user_log_text}用户限速: ${node_speedlimit} Mbps\n"
+#                     user_log_text="${user_log_text}总流量: ${transfer_enable_text}\n"
+#                     user_log_text="${user_log_text}剩余流量: ${transfer_used_text}\n"
+#                     user_log_text="${user_log_text}已使用流量: ${last_day_t_text}\n"
+#                     user_log_text="${user_log_text}等级过期时间: ${class_expire}\n"
+#                     user_log_text="${user_log_text}账户过期时间: ${expire_in}\n"
+#                     user_log_text="${user_log_text}上次签到时间: ${last_check_in_time_text}"
+                    user_log_text=${user}
                 else
                     user_log_text=""
                 fi
@@ -340,9 +361,8 @@ ssp_autochenkin() {
 
             user_count=$(expr ${user_count} + 1)
         done
-
+        log_text="${log_text}\n续命情况：$(keep_alive)"
         log_text="${log_text}\n\n免费使用自: https://github.com/isecret/sspanel-autocheckin"
-
         send_message
 
         rm -rf ${COOKIE_PATH}

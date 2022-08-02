@@ -25,6 +25,7 @@ env:
     WEWORK_AGENT_ID: ${{secrets.WEWORK_AGENT_ID}}
     WEWORK_SECRET: ${{secrets.WEWORK_SECRET}}
     DISPLAY_CONTEXT: ${{secrets.DISPLAY_CONTEXT}}
+    ALIVE: ${{secrets.ALIVE}}
 
 jobs:
     build:
